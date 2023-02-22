@@ -1,0 +1,38 @@
+
+10 albuns mais vendidos 
+
+
+WITH album_sales
+AS (
+	SELECT ab.album_id
+		,ab.title AS album
+		,at.NAME AS artista
+		,sum(total) AS total
+	FROM album AS ab
+	LEFT JOIN track AS t ON ab.album_id = t.album_id
+	LEFT JOIN artist AS at ON at.artist_id = ab.artist_id
+	LEFT JOIN invoice_line AS il ON t.track_id = il.track_id
+	LEFT JOIN invoice AS i ON il.invoice_id = i.invoice_id
+	LEFT JOIN genre AS g ON t.genre_id = g.genre_id
+	WHERE g.genre_id NOT IN (
+			10
+			,19
+			,22
+			,18
+			,20
+			,21
+			) GENEROS EXCLUIDOS DE TRILHAS SONORAS
+		,PARA DEIXAR SOMENTE ARTISTAS
+		AND total IS NOT NULL
+	GROUP BY 1
+		,2
+		,3
+	ORDER BY total DESC
+	) -- CTE PARA IDENTIFICAR OS ALUNS MAIS VENDIDOS
+SELECT album
+	,artista
+	,total
+	,row_number() OVER (
+		ORDER BY total DESC
+		) -- WINDOW FUNCTION PARA ENUMERAR OS REGISTROS PELO VALOR, DO MAIOR PARA O MENOR
+FROM album_sales limit 10
