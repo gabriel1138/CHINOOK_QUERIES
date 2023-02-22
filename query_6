@@ -1,0 +1,27 @@
+MELHOR CLIENTE DE CADA PAIS
+BEST CUSTOMER BY COUNTRY
+
+WITH customer_list
+AS (
+	SELECT list.nome_completo
+		,list.pais
+		,list.total
+		,row_number() OVER (
+			PARTITION BY pais ORDER BY total DESC
+			) AS ranking
+	FROM (
+		SELECT first_name || ' ' || last_name AS nome_completo
+			,country AS pais
+			,sum(total) AS total
+		FROM customer AS c
+		LEFT JOIN invoice AS iv ON c.customer_id = iv.customer_id
+		GROUP BY nome_completo
+			,pais
+		ORDER BY total DESC
+		) AS list -- SUBQUERY  PARA CRIAR LISTA DE PAISES,PODERIA SER COM CTE
+	) -- transformamos em uma cte para uma legibilidade melhor
+SELECT nome_completo
+	,pais
+	,total
+FROM customer_list
+WHERE ranking = 1 -- MELHORES CLIENTES DE CADA PAIS
