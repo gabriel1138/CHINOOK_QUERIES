@@ -1,0 +1,26 @@
+faixa mais vendidas 
+MOST SOLD TRACKS
+
+SELECT t.NAME
+	,at.NAME AS nome
+	,at.NAME AS artista
+	,sum(total) AS total
+FROM track AS t
+LEFT JOIN invoice_line AS il ON t.track_id = il.track_id
+LEFT JOIN invoice AS iv ON il.invoice_id = iv.invoice_id
+LEFT JOIN album AS ab ON ab.album_id = t.album_id
+LEFT JOIN genre AS g ON g.genre_id = t.genre_id
+LEFT JOIN artist AS at ON at.artist_id = ab.artist_id
+WHERE total IS NOT NULL
+	AND g.genre_id NOT IN (
+		10
+		,19
+		,22
+		,18
+		,20
+		,21
+		) -- ILTER TO EXCLUDE TV SHOWS AND SOUNDTRACKS
+GROUP BY t.NAME
+	,nome
+	,artista
+ORDER BY total DESC LIMIT 10
